@@ -1,0 +1,8 @@
+{
+  "name": "js-obfuscation-dataset-generator",
+  "version": "0.1",
+  "dependencies": {
+    "javascript-obfuscator": "^4.0.2"
+  },
+  "type": "module"
+}
