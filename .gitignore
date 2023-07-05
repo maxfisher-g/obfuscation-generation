@@ -1,1 +1,8 @@
-node_modules
+bin/
+lib/
+lib64
+node_modules/
+non-obfuscated-files/
+obfuscated-files/
+*.tgz
+*.tar.gz
