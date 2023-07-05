@@ -15,12 +15,13 @@ const variablesDictionary = [
   "output", "scores", "sender", "string", "var_in", "current", "var_out", "filename", "temp_vec"
 ];
 
+// Each input file is obfuscated with every permutation of these options
 const switchableOptions = {
   compact: [false],
   controlFlowFlattening: [true, false],
   deadCodeInjection: [false],
   debugProtection: [false],
-  identifierNamesGenerator: ['dictionary', 'hexadecimal', 'mangled', 'mangled-shuffled'],
+  identifierNamesGenerator: ['dictionary', 'hexadecimal'],
   numbersToExpressions: [true, false],
   renameGlobals: [true],
   renameProperties: [true],
@@ -28,7 +29,7 @@ const switchableOptions = {
   simplify: [true],
   splitStrings: [true, false],
   stringArray: [true, false],
-  stringArrayCallsTransform: [true, false],
+  stringArrayCallsTransform: [true],
   transformObjectKeys: [true, false],
   unicodeEscapeSequence: [false],
 }
@@ -39,6 +40,7 @@ const fixedOptions = {
   identifiersDictionary: variablesDictionary,
   renamePropertiesMode: 'safe',
   stringArrayEncoding: ['none', 'base64'],
+  stringArrayCallsTransformThreshold: 0.5,
   target: 'node',
 };
 
@@ -209,7 +211,7 @@ function main() {
   const args = process.argv;
 
   if (args.length === 2) {
-    console.log(`Usage: ${args[0]} ${args[1]} <filenames.txt>`)
+    console.log(`Usage: ${args[0]} ${args[1]} <filenames.txt> [output dir]`)
     process.exit(-1);
   }
 
