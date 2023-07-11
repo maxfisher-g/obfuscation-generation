@@ -293,13 +293,9 @@ function parseCliArgs(args) {
 }
 
 function batchMode(filenamesFile, justMinify, outputDir) {
-  const lines = fs.readFileSync(filenamesFile, {encoding: "utf8"}).split("\n");
-  const filenames = [];
-  for (let line of lines) {
-    if (line !== "") {
-      filenames.push(line);
-    }
-  }
+  const filenames = fs.readFileSync(filenamesFile, {encoding: "utf8"})
+    .split("\n")
+    .filter(filename => filename !== "");
 
   if (justMinify) {
     processFiles(filenames, (filename, _) => {
