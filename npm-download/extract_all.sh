@@ -1,11 +1,24 @@
 #! /bin/bash
 
-DEST_DIR=../non-obfuscated-files
+DEST_DIR="${DEST_DIR:-../non-obfuscated-files}"
 
-for f in *; do
-	echo "$f"
-	export EXTRACT_DIR="${f%%.tgz}"
-	mkdir "$EXTRACT_DIR" && tar -xf "$f" -C "$EXTRACT_DIR" && find "$EXTRACT_DIR" -name "*.js" | ./flatten_directory_tree.py "$DEST_DIR" && \rm -rf "$EXTRACT_DIR"
+if [[ $# -eq 0 ]]; then
+	echo "Usage: $0 <files...>"
+	exit 1
+fi
+
+function extract {
+	echo "$1"
+	export EXTRACT_DIR=$(basename "${1%%.tgz}")
+	mkdir "$EXTRACT_DIR"
+	tar -xf "$1" -C "$EXTRACT_DIR"
+	find "$EXTRACT_DIR" -type d -exec chmod +x '{}' ';'
+	find "$EXTRACT_DIR" -type f -name "*.js" | ./flatten_directory_tree.py "$DEST_DIR" && \rm -rf "$EXTRACT_DIR"
 	unset EXTRACT_DIR
+}
+
+
+for f in "$@"; do
+	extract "$f"
 done
 

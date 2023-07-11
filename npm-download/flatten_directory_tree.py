@@ -24,7 +24,7 @@ def do_op(dest_dir: str, remove_prefix: str, slash_replace: str, op: str):
         dest_path = os.path.join(dest_dir, dest_basename)
 
         command = f"{op} {src_path} {dest_path}"
-        print(command)
+        #print(command)
         os.system(command)
 
 
