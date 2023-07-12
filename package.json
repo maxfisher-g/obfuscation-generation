@@ -2,7 +2,9 @@
   "name": "js-obfuscation-dataset-generator",
   "version": "0.1",
   "dependencies": {
-    "javascript-obfuscator": "^4.0.2"
+    "@babel/parser":  "^7.22.7",
+    "javascript-obfuscator": "^4.0.2",
+    "uglify-js": "^3.17.4"
   },
   "type": "module"
 }
