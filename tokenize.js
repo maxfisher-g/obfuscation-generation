@@ -15,8 +15,14 @@ export function tokenize(filename) {
 
   const tokenValues = [];
   let lastEndPos = 0;
+  let lastLine = 1;
   for (let t of ast.tokens) {
     // check if there was whitespace since last token
+    if (t.loc.start.line > lastLine) {
+      tokenValues.push("\n");
+      lastEndPos++;
+    }
+    lastLine = t.loc.end.line;
     if (t.start > lastEndPos) {
       tokenValues.push(" ");
     }
