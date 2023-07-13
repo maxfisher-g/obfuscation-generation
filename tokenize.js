@@ -3,7 +3,7 @@
 import fs from "node:fs";
 import parser from "@babel/parser";
 
-export function tokenize(filename) {
+export function tokenize(filename, printDebug = false) {
   const sourceCode = fs.readFileSync(filename, { encoding: "utf8" });
 
   const ast = parser.parse(sourceCode, {
@@ -19,12 +19,12 @@ export function tokenize(filename) {
   for (let t of ast.tokens) {
     // check if there was whitespace since last token
     if (t.loc.start.line > lastLine) {
-      tokenValues.push("\n");
+      tokenValues.push("nl");
       lastEndPos++;
     }
     lastLine = t.loc.end.line;
     if (t.start > lastEndPos) {
-      tokenValues.push(" ");
+      tokenValues.push("sp");
     }
     lastEndPos = t.end;
 
@@ -32,7 +32,7 @@ export function tokenize(filename) {
     if (t.value === undefined) {
       // syntax marker (e.g bracket, dot)
       value = t.type.label;
-    } else if (t.type.label === "string") {
+    } else if (t.type.label === "string" || t.type.label === "template") {
       // quote string
       value = `"${t.value}"`
     } else {
@@ -42,7 +42,23 @@ export function tokenize(filename) {
     tokenValues.push(value);
   }
 
-  console.log(sourceCode);
-  console.log(tokenValues);
+  if (printDebug) {
+    console.log(ast.tokens);
+    console.log(sourceCode);
+    console.log(tokenValues);
+  }
   return tokenValues;
+}
+
+// formats the list of tokens returned by tokenize() into a
+// Python list of strings
+export function formatTokens(tokens, includeSpace) {
+  const tokenList = [];
+  for (let t of tokens) {
+    if (t === "sp" && !includeSpace) {
+      continue;
+    }
+    tokenList.push(`'${t}'`)
+  }
+  return "[" + tokenList.join(", ") + "]";
 }

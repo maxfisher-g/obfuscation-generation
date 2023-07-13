@@ -5,7 +5,7 @@ import fs from "node:fs";
 
 import { minify } from "./minify.js";
 import * as obfuscate from "./obfuscate.js"
-import { tokenize } from "./tokenize.js"
+import { tokenize, formatTokens } from "./tokenize.js"
 import { confirmContinue } from "./utils.js";
 
 const modes = ["minify", "obfuscate", "tokenize"];
@@ -86,6 +86,8 @@ function doSingleFile(inputFile, mode, outputDir) {
       break;
     case "tokenize":
       const tokens = tokenize(inputFile);
+      const formattedTokens = formatTokens(tokens, false);
+      console.log(formattedTokens);
   }
 }
 
