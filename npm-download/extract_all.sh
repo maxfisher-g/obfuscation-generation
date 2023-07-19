@@ -11,9 +11,9 @@ function extract {
 	echo "$1"
 	export EXTRACT_DIR=$(basename "${1%%.tgz}")
 	mkdir "$EXTRACT_DIR"
-	tar -xf "$1" -C "$EXTRACT_DIR"
+	tar -xf "$1" -C "$EXTRACT_DIR" --delay-directory-restore
 	find "$EXTRACT_DIR" -type d -exec chmod +x '{}' ';'
-	find "$EXTRACT_DIR" -type f -name "*.js" | ./flatten_directory_tree.py "$DEST_DIR" && \rm -rf "$EXTRACT_DIR"
+	find "$EXTRACT_DIR" -type f -name "*.js" | ./flatten_directory_tree.py -d "$DEST_DIR" && \rm -rf "$EXTRACT_DIR"
 	unset EXTRACT_DIR
 }
 
