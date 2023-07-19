@@ -195,7 +195,6 @@ function main() {
     usage(true);
     process.exit(-1);
   }
-  //debugFailingObfuscationCases(sourceCode);
 
   if (cliArgs.outdir === "") {
     cliArgs.outdir = process.cwd();
