@@ -12,6 +12,8 @@ import sys
 
 
 def do_op(dest_dir: str, remove_prefix: str, slash_replace: str, op: str, print_cmd: bool):
+    # overall returncode is 1 if any individual copy returned a nonzero returncode, else 0
+    overall_returncode = 0
     while True:
         src_path = ""
         try:
@@ -27,7 +29,11 @@ def do_op(dest_dir: str, remove_prefix: str, slash_replace: str, op: str, print_
         if print_cmd:
             print(command)
 
-        return subprocess.run([op, src_path, dest_path]).returncode
+        status = subprocess.run([op, src_path, dest_path], text=True, capture_output=True)
+        if status.returncode != 0:
+            overall_returncode = 1
+            print(status.stderr)
+    return overall_returncode
 
 
 
