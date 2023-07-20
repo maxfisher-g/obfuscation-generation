@@ -2724,7 +2724,6 @@ pkg:npm/json-server
 pkg:npm/json-stable-stringify
 pkg:npm/json-stable-stringify-without-jsonify
 pkg:npm/jsonstream
-pkg:npm/JSONStream
 pkg:npm/json-stringify-pretty-compact
 pkg:npm/json-stringify-safe
 pkg:npm/json-to-pretty-yaml
@@ -2823,7 +2822,6 @@ pkg:npm/koa-passport
 pkg:npm/koa-redis
 pkg:npm/koa-route
 pkg:npm/@koa/router
-pkg:npm/koa-router
 pkg:npm/koa-send
 pkg:npm/koa-session
 pkg:npm/koa-static
