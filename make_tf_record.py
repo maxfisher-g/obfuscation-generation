@@ -26,7 +26,7 @@ def int64_feature(value):
     return tf.train.Feature(int64_list=tf.train.Int64List(value=[value]))
 
 def create_example(source_filename: str, is_obfuscated: bool):
-    # not all files are in utf-8
+    # note: not all files are in utf-8, so we don't decode yet
     source_file_data = Path(source_filename).read_bytes()
 
     feature = {
@@ -37,29 +37,30 @@ def create_example(source_filename: str, is_obfuscated: bool):
     return tf.train.Example(features=tf.train.Features(feature=feature))
 
 def main():
-    print_progress = False
-
     arg_parser = argparse.ArgumentParser(
         description="Packs source files into tfrecord format with a label as either obfuscated or non-obfuscated"
     )
 
-    arg_parser.add_argument("-l", "--label", required=True, type=int,
-            help="obfuscation label for files, either 0 (non-obfuscated) or 1 (obfuscated)")
-    arg_parser.add_argument("-f", "--files", required=True, type=Path,
-            help="list of source files to process, one path per line ")
     arg_parser.add_argument("-d", "--dir", required=True, type=Path,
             help="output directory for tfrecord files")
-    arg_parser.add_argument("-c", "--count", default="65536", type=int,
-            help="number of files to store in each tfrecord file")
+    arg_parser.add_argument("-f", "--files", required=True, type=Path,
+            help="list of source files to process, one path per line ")
+    arg_parser.add_argument("-l", "--label", required=True, type=int,
+            help="obfuscation label for files, either 0 (non-obfuscated) or 1 (obfuscated)")
+    arg_parser.add_argument("-n", "--nrecords", default="65536", type=int, metavar="NUM",
+            help="number of files to store in each tfrecord file (default 65536)")
+    arg_parser.add_argument("-p", "--prefix", default="",
+            help="prefix to add to generated tfrecord filenames")
     arg_parser.add_argument("-v", "--verbose", action="store_true", default=False,
             help="print out verbose progress info")
 
     parsed_args = arg_parser.parse_args()
 
     record_dir = parsed_args.dir
-    samples_per_record = parsed_args.count
+    samples_per_record = parsed_args.nrecords
     files_list = parsed_args.files
-    print_process = parsed_args.verbose
+    print_progress = parsed_args.verbose
+    prefix = parsed_args.prefix
 
     match parsed_args.label:
         case 0:
@@ -81,7 +82,7 @@ def main():
     with open(files_list, "rt") as source_files:
         eof = False
         while not eof:
-            record_filename = f"{record_number}.tfrec"
+            record_filename = f"{prefix}{record_number}.tfrec"
             with TFRecordWriter(bytes(record_dir / record_filename)) as writer:
                 sample_number = 0
                 while not eof:
@@ -91,7 +92,7 @@ def main():
                         eof = True
                         break
 
-                    if print_process:
+                    if print_progress:
                         print(f"[{record_filename} {sample_number % samples_per_record}/{samples_per_record}] {source_filename}")
 
                     example = create_example(source_filename, obfuscation_label)
