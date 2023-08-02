@@ -35,6 +35,9 @@ const cliOptions = {
   infile: { type: "string", short: "i", default: ""},
   batch: { type: "string", short: "b", default: ""},
   outdir: { type: "string", short: "d", default: "" },
+//  obfuscate: { type: "boolean", short: "o", default: true },
+//  minify: { type: "boolean", short: "m", default: false },
+//  tokenize: { type: "boolean", short: "t", default: false },
   mode: { type: "string", short: "m", default: "obfuscate" },
   help: { type: "boolean", short: "h", default: false },
 };

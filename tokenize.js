@@ -34,7 +34,8 @@ export function tokenize(filename, printDebug = false) {
       value = t.type.label;
     } else if (t.type.label === "string" || t.type.label === "template") {
       // quote string
-      value = `"${t.value}"`
+      // TODO escape quotes in string
+      value = `'${t.value}'`
     } else {
       // anything else
       value = t.value;
@@ -58,7 +59,7 @@ export function formatTokens(tokens, includeSpace) {
     if (t === "sp" && !includeSpace) {
       continue;
     }
-    tokenList.push(`'${t}'`)
+    tokenList.push(`"${t}"`)
   }
   return "[" + tokenList.join(", ") + "]";
 }
