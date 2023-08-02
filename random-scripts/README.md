@@ -1,0 +1,1 @@
+This directory contains a bunch of random scripts that were at some point useful for data exploration of large numbers of downloaded JS files. They're not part of the official pipeline but may be useful again in the future.
