@@ -3,6 +3,10 @@ lib/
 lib64
 node_modules/
 non-obfuscated-files/
+npm-download/downloader
+npm-download/extracted-js-files/
 obfuscated-files/
-*.tgz
+pyvenv.cfg
 *.tar.gz
+*.tgz
+*.txt
