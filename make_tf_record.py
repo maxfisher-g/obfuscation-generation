@@ -44,7 +44,7 @@ def main():
     arg_parser.add_argument("-d", "--dir", required=True, type=Path,
             help="output directory for tfrecord files")
     arg_parser.add_argument("-f", "--files", required=True, type=Path,
-            help="list of source files to process, one path per line ")
+            help="list of source files to process, one path per line")
     arg_parser.add_argument("-l", "--label", required=True, type=int,
             help="obfuscation label for files, either 0 (non-obfuscated) or 1 (obfuscated)")
     arg_parser.add_argument("-n", "--nrecords", default="65536", type=int, metavar="NUM",
