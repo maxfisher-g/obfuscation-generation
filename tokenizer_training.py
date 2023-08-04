@@ -1,28 +1,40 @@
+import argparse
 import io
 import sentencepiece as spm
-from pathlib import Path
 from enum import IntEnum
+from pathlib import Path
+from textwrap import dedent
+from typing import Iterable
 
 
-# for use with minloglevel
+# for use with minloglevel argument to SentencePieceTrainer.Train()
 class LogLevel (IntEnum):
     WARNING = 1
     INFO = 0
 
 
-def train_model(input_filenames: list[str]) -> io.BytesIO:
-    sentences = map(lambda filename: Path(filename.strip()).read_bytes(), input_filenames)
+def train_model(input_filenames: Iterable[str], verbose: bool) -> io.BytesIO:
+    # max input size (filesize) is 10k bytes
+    # TODO consider splitting up long files into multiple sections
+    max_sentence_size = 10000
 
+    # aim to tokenize 99% of input characters
+    character_coverage = 0.99
+
+    def filename_to_sentence(filename: str) -> bytes:
+        return Path(filename).read_bytes()
+
+    min_log_level = LogLevel.INFO if verbose else LogLevel.WARNING
     model = io.BytesIO()
 
     spm.SentencePieceTrainer.Train(
-        sentence_iterator=sentences,
+        sentence_iterator=map(filename_to_sentence, input_filenames),
         model_writer=model,
         vocab_size=16000,
         model_type="bpe",
-        max_sentence_length=50000,
-        character_coverage=0.995,
-        minloglevel=LogLevel.INFO,
+        max_sentence_length=max_sentence_size,
+        character_coverage=character_coverage,
+        minloglevel=min_log_level,
         user_defined_symbols=["\n"],  # include newline in vocabulary
         normalization_rule_name="identity",  # don't replace unicode chars with equivalent ones
         remove_extra_whitespaces=0,
@@ -33,37 +45,63 @@ def train_model(input_filenames: list[str]) -> io.BytesIO:
     return model
 
 
-def test_model(model_filename):
+def test_model(model, test_stringe):
     sp = spm.SentencePieceProcessor()
 
-    with open(model_filename, "rb") as modelfile:
-        sp.LoadFromSerializedProto(modelfile.read())
+    #with open(model_filename, "rb") as modelfile:
+    #    sp.LoadFromSerializedProto(modelfile.read())
 
-    test_string = "console.log('hello world'); \n\nfor (let i = 0; i < 10; i++) {\n console.log(i%3); } ;"
+    sp.LoadFromSerializedProto(model.getvalue())
+
     print(sp.Encode(test_string, out_type=int))
     print(sp.Encode(test_string, out_type=str))
 
 
-def train_new_model(model_filename):
-    limit = -1
+def main():
+    arg_parser = argparse.ArgumentParser(
+        description="Trains sentencepiece tokenizer model from input files and outputs"
+        "serialized proto model file"
+    )
 
-    with open("non-obfuscated-files.txt") as files_file:
-        files = files_file.readlines()
+    default_test_string = dedent("""
+        console.log("hello world");
+        for (let i = 0; i < 10; i++) {
+            console.log(i%3);
+        }
+    """)
+
+    arg_parser.add_argument("-f", "--files", required=True, type=Path,
+            help="list of source files to process, one path per line")
+    arg_parser.add_argument("-o", "--output", required=True, type=Path,
+            help="output model file")
+    arg_parser.add_argument("-l", "--limit", type=int, metavar="NUM", default=-1,
+            help="only train using first NUM input files")
+    arg_parser.add_argument("-t", "--test-string", default=default_test_string,
+            help="test tokenizing on given string after training")
+    arg_parser.add_argument("-v", "--verbose", action="store_true", default=False,
+            help="print out logging info while training")
+
+    parsed_args = arg_parser.parse_args()
+
+    model_output_path = parsed_args.output
+    input_filepath = parsed_args.files
+    limit = parsed_args.limit
+    verbose = parsed_args.verbose
+    test_string = parsed_args.test_string
+
+    with open(input_filepath) as input_file:
+        files = list(map(str.strip, input_file.readlines()))
 
     if limit > 0:
         files = files[:limit]
 
-    model = train_model(files)
+    model = train_model(files, verbose)
 
-    with open(model_filename, "wb") as modelfile:
-        modelfile.write(model.getvalue())
+    with open(model_output_path, "wb") as model_file:
+        model_file.write(model.getvalue())
 
-
-def main():
-    model_file = "tokenizer-model.model"
-
-    train_new_model(model_file)
-    test_model(model_file)
+    if test_string:
+        test_model(model, test_string)
 
 
 if __name__ == "__main__":
