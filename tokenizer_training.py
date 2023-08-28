@@ -28,7 +28,7 @@ def train_model(input_filenames: Iterable[str], verbose: bool) -> io.BytesIO:
 
     min_log_level = LogLevel.INFO if verbose else LogLevel.WARNING
 
-    def filename_to_sentence(filename: str) -> bytes:
+    def filename_to_sentence(filename: str) -> str:
         return Path(filename).read_text(errors="ignore")
 
     model = io.BytesIO()
