@@ -2,7 +2,7 @@ name: OSV-Scanner Scheduled Scan
 
 on:
   schedule:
-    - cron: '0 4 * * *'
+    - cron: '42 3 * * *' # run at 2.42pm AEDT (3.42am UTC) every day
 # Change "main" to your default branch if you use a different name, i.e. "master"
   push:
     branches: [ main ]
